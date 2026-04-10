@@ -1,0 +1,5 @@
+{
+    "board": "arduino:avr:uno",
+    "port": "/dev/cu.usbserial-120",
+    "sketch": "Arduino_Air_Defense.ino"
+}

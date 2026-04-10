@@ -1,0 +1,59 @@
+#!/bin/bash
+
+# Arduino Verify Script
+# Compiles the sketch to check for errors without uploading
+# Uses board from .vscode/arduino.json
+
+set -e  # Exit on error
+
+# Get the folder name (sketch name)
+FOLDER_NAME=$(basename "$PWD")
+SKETCH_NAME="${FOLDER_NAME}.ino"
+
+# Check if sketch exists
+if [ ! -f "$SKETCH_NAME" ]; then
+    echo "Error: Sketch file '$SKETCH_NAME' not found!"
+    exit 1
+fi
+
+# Parse board from arduino.json
+if [ -f ".vscode/arduino.json" ]; then
+    BOARD=$(grep -o '"board": *"[^"]*"' .vscode/arduino.json | sed 's/"board": *"\([^"]*\)"/\1/')
+else
+    echo "Error: .vscode/arduino.json not found!"
+    exit 1
+fi
+
+# Check if board was found
+if [ -z "$BOARD" ]; then
+    echo "Error: Could not find board in arduino.json"
+    exit 1
+fi
+
+echo "================================================"
+echo "Arduino Verify Script"
+echo "================================================"
+echo "Sketch: $SKETCH_NAME"
+echo "Board:  $BOARD"
+echo "================================================"
+
+# Compile
+echo ""
+echo "Compiling..."
+echo ""
+
+if arduino-cli compile --fqbn "$BOARD" "$SKETCH_NAME" 2>&1; then
+    echo ""
+    echo "================================================"
+    echo "✓ Verification successful!"
+    echo "================================================"
+    exit 0
+else
+    echo ""
+    echo "================================================"
+    echo "✗ Verification failed!"
+    echo "================================================"
+    echo ""
+    echo "Fix the compilation errors above and try again."
+    exit 1
+fi
