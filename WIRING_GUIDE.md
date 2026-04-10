@@ -24,20 +24,14 @@ This guide explains how to wire the MAX7219 8x8 LED unicolor matrix display to y
 ## Pin Configuration
 
 ### Arduino Pins Used:
-- **Pin 3**: Servo Motor 2 (Trigger mechanism, PWM)
 - **Pin 5**: Buzzer
 - **Pin 6**: Ultrasonic Sensor (ECHO)
 - **Pin 7**: Ultrasonic Sensor (TRIG)
-- **Pin 9**: Servo Motor 1 (Radar sweep)
+- **Pin 9**: Servo Motor
 - **Pin 10**: MAX7219 Chip Select (CS)
 - **Pin 11**: MAX7219 Data In (DIN)
 - **Pin 12**: MAX7219 Clock (CLK)
 - **Pin 13**: LED (Alert indicator)
-
-> **Note:** Pin 10 is shared between Servo 2 and MAX7219 CS on some older
-> revisions of this project. The current code assigns Servo 2 to **Pin 3**
-> (a PWM-capable pin) so that Pin 10 is exclusively available for the
-> MAX7219 CS line.
 
 ---
 
@@ -95,22 +89,12 @@ Note: If using 5V on ECHO damages 3.3V pins, add voltage divider:
                           +-- Pin 6 (Arduino)
 ```
 
-### 4. Servo Motor 1 (Radar Sweep)
+### 4. Servo Motor
 
 ```
-Arduino              Servo Motor 1
---------------------------------------
+Arduino              Servo Motor
+-------------------------------
 Pin 9        ----> Signal (Orange/Yellow wire)
-5V           ----> Power (Red wire)
-GND          ----> Ground (Brown/Black wire)
-```
-
-### 4b. Servo Motor 2 (Trigger Mechanism)
-
-```
-Arduino              Servo Motor 2
---------------------------------------
-Pin 3 (PWM)  ----> Signal (Orange/Yellow wire)
 5V           ----> Power (Red wire)
 GND          ----> Ground (Brown/Black wire)
 ```
@@ -149,12 +133,9 @@ GND          ----> Negative (-)
 | HC-SR04 ECHO | 6 | Echo pulse | 5V |
 | HC-SR04 VCC | - | Power | 5V |
 | HC-SR04 GND | - | Ground | GND |
-| Servo 1 Signal (Radar Sweep) | 9 | PWM control | 5V |
-| Servo 1 Power | - | Power | 5V* |
-| Servo 1 GND | - | Ground | GND |
-| Servo 2 Signal (Trigger) | 3 | PWM control | 5V |
-| Servo 2 Power | - | Power | 5V* |
-| Servo 2 GND | - | Ground | GND |
+| Servo Signal | 9 | PWM control | 5V |
+| Servo Power | - | Power | 5V* |
+| Servo GND | - | Ground | GND |
 | LED Anode | 13 | Through 470Ω | 5V |
 | LED GND | - | Resistor to GND | GND |
 | Buzzer (+) | 5 | Signal | 5V |
@@ -253,53 +234,11 @@ lc.setIntensity(0, 8);    // Brightness 0-15 (8 is mid-range)
 
 ## Display Functionality
 
-- **When object detected (≤30cm)**: Shows distance in cm (two-digit, 00-99) on LED matrix with buzzer beep and LED flash
-- **When no object detected**: Shows "--" (dash) on LED matrix
+- **When object detected (≤30cm)**: Shows distance as single digit (0-9) on LED matrix
+- **When no object detected**: Shows "NiR" (Not in Range) pattern on LED matrix
 - **LED**: Flashes when object is detected
 - **Buzzer**: Beeps when object is detected
-- **Servo 1**: Sweeps ±45° when no object; holds position when object detected
-- **Servo 2**: Triggers once per detection cycle then resets
-
----
-
-## Processing 4 Radar Display
-
-A companion Processing 4 sketch (`RadarDisplay/RadarDisplay.pde`) provides a
-real-time software radar screen driven by the Arduino's serial output.
-
-### How it works
-
-The Arduino sketch emits a structured line each loop iteration:
-
-```
-RADAR:angle,distance
-```
-
-where `angle` is the current servo position (45–135°) and `distance` is the
-sensor reading in cm (-1 when nothing is detected).  The Processing sketch
-reads these lines and renders:
-
-- A half-circle radar grid with concentric distance rings
-- Amber alert ring at the 30 cm threshold
-- A sweeping green line that follows the servo in real time
-- Fading green blips at each detected object's position
-- A live HUD showing angle, distance, blip count, and alert status
-
-### Quick-start
-
-1. Upload `Arduino_Air_Defense.ino` to your Arduino.
-2. Open `RadarDisplay/RadarDisplay.pde` in Processing 4.
-3. Run once — the console lists available serial ports.
-4. Set `PORT_INDEX` at the top of the sketch to the index of your Arduino port.
-5. Run again to see the live radar display.
-
-### Keyboard shortcuts
-
-| Key | Action |
-|-----|--------|
-| `C` | Clear all detection blips |
-| `+` | Increase max display range (+50 cm) |
-| `-` | Decrease max display range (−50 cm) |
+- **Servo**: Sweeps ±45° when no object; holds position when object detected
 
 ---
 
@@ -311,5 +250,4 @@ reads these lines and renders:
 4. Verify distance readings on Serial Monitor
 5. Calibrate ultrasonic sensor if needed
 6. Adjust brightness and display patterns as desired
-7. Open `RadarDisplay/RadarDisplay.pde` in Processing 4 for the radar display
 
